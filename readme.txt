@@ -1,10 +1,10 @@
 === jsDelivr - Wordpress CDN Plugin ===
-Contributors: jimaek,martinsuly 
+Contributors: jimaek,martinsuly
 Donate link: http://www.jsdelivr.com
 Tags: cdn,speed,jsdelivr,optimize,delivery,network,javascript,async,defer,performance,
 Requires at least: 3.0
-Tested up to: 3.4.1
-Stable tag: 0.2
+Tested up to: 3.6
+Stable tag: 0.2.1
 
 The official plugin of jsDelivr.com, a free public CDN. An easy way to integrate the service and speed up your website using our super fast CDN.
 
@@ -61,7 +61,7 @@ Just update and then scan your website for files that can be loaded from our CDN
 The priority works only when the files are moved to footer.
 Zero has the highest priority. So for example you can give to jQuery the priority 0 then to a plugin priority 1 and if the plugins has javascript addons then 2,3,4,5...
 
-This ensures that there will be no problems with undeclared functions etc. 
+This ensures that there will be no problems with undeclared functions etc.
 If you leave the priority as is then the files will be moved to footer with the same order they were originally declared.
 
 = What does the yellow match mean? =
@@ -78,6 +78,9 @@ Dont worry about it.
 
 
 == Changelog ==
+
+= 0.2.1 =
+* fixed issue caused by jQuery.blockUI plugin (updated to the newest version)
 
 = 0.2 =
 * Some misc. changes
