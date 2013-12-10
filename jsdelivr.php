@@ -32,7 +32,7 @@ if (!class_exists('jsdelivr'))
   class jsdelivr
   {
     const ld = 'jsdelivr'; // name of localization domain
-    const version = '0.2'; // current version
+    const version = '0.2.1'; // current version
     const nonce = 'jsdelivr_nonce';
 
     // turn on/off debug mode
