@@ -98,7 +98,7 @@ if (!class_exists('jsdelivr'))
         // load translation on plugins_loaded
         add_action('plugins_loaded', array(&$this, 'plugins_loaded'));
 
-        $this->url = WP_PLUGIN_URL.'/'.dirname(plugin_basename(__FILE__));
+        $this->url = plugins_url().'/'.dirname(plugin_basename(__FILE__));
         $this->path = WP_PLUGIN_DIR.'/'.dirname(plugin_basename(__FILE__));
 
         add_action('admin_menu', array(&$this, 'admin_menu'));
