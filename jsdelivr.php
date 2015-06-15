@@ -781,7 +781,7 @@ if (!class_exists('jsdelivr'))
       $wpdb->query("TRUNCATE TABLE ".$wpdb->jsd_files);
 
       $pages = array();
-      $pages[] = get_bloginfo('home').'/'; // it can scan more URLs, but this is for testing
+      $pages[] = home_url('/'); // it can scan more URLs, but this is for testing
 
       // cache flush
       $this->cache_flush();
