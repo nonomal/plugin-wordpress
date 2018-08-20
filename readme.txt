@@ -1,25 +1,26 @@
 === jsDelivr - Wordpress CDN Plugin ===
-Contributors: jimaek,martinsuly
-Donate link: http://www.jsdelivr.com
+Contributors: jimaek
+Donate link: https://www.jsdelivr.com
 Tags: cdn,speed,jsdelivr,optimize,delivery,network,javascript,async,defer,performance,
-Requires at least: 3.0
-Tested up to: 3.6
-Stable tag: 0.2.1
+Requires at least: 4.0
+Tested up to: 4.9
+Stable tag: 1.0
 
 The official plugin of jsDelivr.com, a free public CDN. An easy way to integrate the service and speed up your website using our super fast CDN.
 
 == Description ==
 
-This plugin allows you to easily integrate and use the services of [jsDelivr.com](http://www.jsdelivr.com) in your WordPress website.
+This plugin allows you to easily integrate and use the services of [jsDelivr.com](https://www.jsdelivr.com) in your WordPress website.
 
-[Support](http://jsdelivr.uservoice.com/forums/169238-wordpress-plugin-support) | [Submit Files](http://jsdelivr.uservoice.com/forums/164147-plugins-submission)
+[Support](https://github.com/jsdelivr/jsdelivr-wordpress) | [Github Repo](https://github.com/jsdelivr/jsdelivr-wordpress)
 
-jsDelivr is a free public CDN that hosts javascript libraries and jQuery plugins, including all of the files they need to work (css/png).
-It even hosts javascript files that use popular WordPress plugins, like WP SlimStat.
-Basically if a lot of websites use it then we probably can host it.
+jsDelivr is a free public CDN that hosts open source files, including javascript libraries, fonts, css frameworks all of the files they need to work (css/png).
+It also hosts all files used by all free WordPress plugins and themes hosted in the official WordPress repo.
+
+jsDelivr uses multiple CDN providers such as Stackpath, Fastly, Cloudflare and Quantil in China to ensure the best possible performance and 100% uptime to all users. Make sure to [checkout our infographic to learn how it works](https://www.jsdelivr.com/network/infographic).
 
 With this plugin you can automatically integrate our super fast CDN into your website without the trouble of editing your code and searching for the correct URLs.
-Just update and then scan your website for files that can be loaded from our CDN.
+Just install the plugin and it will automatically take care of the rest and ensure that all valid files will be loaded through our super fast CDN.
 
 **Benefits:**
 
@@ -33,17 +34,10 @@ Just update and then scan your website for files that can be loaded from our CDN
 * 	Move selected files to footer
 * 	Apply Async/Defer loading to your javascripts.
 * 	Compatible with W3 Total Cache and WP Super Cache
-* 	Automatic synchronization with our DB.
+* 	Fully automatic. Install and forget about it.
 * 	Allows you to select the files you want to load from the CDN
-*	Supports HTTPS
-* 	Uses Google CDN to load jQuery to take advantage of the user's browser cache.
+*	  Supports HTTPS
 
-
-
-**Contributors:**
-
-*	Coded by [Martin Sudolsky](http://martin.sudolsky.com/)
-*	Banner by [Stratos Iordanidis](http://ssstratos.com/)
 
 == Installation ==
 
@@ -56,13 +50,6 @@ Just update and then scan your website for files that can be loaded from our CDN
 2. Settings menu after update and scan are finished. Move to footer is enabled.
 
 == Frequently Asked Questions ==
-
-= How the priority system works? =
-The priority works only when the files are moved to footer.
-Zero has the highest priority. So for example you can give to jQuery the priority 0 then to a plugin priority 1 and if the plugins has javascript addons then 2,3,4,5...
-
-This ensures that there will be no problems with undeclared functions etc.
-If you leave the priority as is then the files will be moved to footer with the same order they were originally declared.
 
 = What does the yellow match mean? =
 You have to be careful with those. It can be two things.
@@ -79,17 +66,9 @@ Dont worry about it.
 
 == Changelog ==
 
-= 0.2.1 =
-* fixed issue caused by jQuery.blockUI plugin (updated to the newest version)
+= 1.0 =
+* first stable release
 
-= 0.2 =
-* Some misc. changes
-* Solved the problem with infinity scanning (added better error handling)
-* Added alternative method to CURL via file_get_contents (if http wrapper and allow_url_fopen is enabled) or fsockopen
-* Updated versions of google hosted files (I did it only up to 1.8.3, because it seems that many scripts are unstable with jQuery 1.9.x)
-* Fixed issue with problematic detection of protocol used on webserver (http or https)
-* Fixed regular expressions (problems with search)
-* Images are parsed by extension (so I added list of supported extensions)
 
 
 
