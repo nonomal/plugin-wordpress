@@ -130,7 +130,19 @@ class JsDelivrCdn
         return $links;
     }
 
-
+	/**
+	 * @param $url
+	 *
+	 * @return bool
+	 */
+	public static function checkUrlExists($url){
+		$response = wp_remote_head($url, array( 'timeout' => 5 ));
+		$accepted_status_codes = array( 200);
+		if ( ! is_wp_error( $response ) && in_array( wp_remote_retrieve_response_code( $response ), $accepted_status_codes ) ) {
+			return true;
+		}
+		return false;
+	}
 
     /**
      * get jsdelivr url for script
@@ -147,9 +159,16 @@ class JsDelivrCdn
             if($jsdelivr_data) {
                 if (isset($jsdelivr_data['file'])) {
                     if($jsdelivr_data['name'] === 'WordPress/WordPress') {
-                        $jsdelivr_data['version'] = get_bloginfo( 'version' );
+                    	$blogVersion = get_bloginfo( 'version' );
+	                    $temp = self::JSDELIVR_CDN_URL."{$jsdelivr_data['type']}/{$jsdelivr_data['name']}@{$blogVersion}{$jsdelivr_data['file']}";
+	                    if(self::checkUrlExists($temp)) {
+		                    $jsdelivrcdn_url = $temp;
+		                    $jsdelivr_data['version'] = $blogVersion;
+	                    }
+                    } else {
+	                    $jsdelivrcdn_url = self::JSDELIVR_CDN_URL."{$jsdelivr_data['type']}/{$jsdelivr_data['name']}@{$jsdelivr_data['version']}{$jsdelivr_data['file']}";
                     }
-                    $jsdelivrcdn_url = self::JSDELIVR_CDN_URL."{$jsdelivr_data['type']}/{$jsdelivr_data['name']}@{$jsdelivr_data['version']}{$jsdelivr_data['file']}";
+
                 } elseif(preg_match("/wp-content\/plugins\/(?<plugin>[^\/]*)\/(?<file>.*)/i", $script->src, $matches)) {
                     if($matches['plugin'] && $matches['file']) {
                         $pluginFile = ABSPATH."wp-content/plugins/{$matches['plugin']}/{$matches['plugin']}.php";
@@ -165,14 +184,20 @@ class JsDelivrCdn
                             }
                         }
                         if($plugin_data['Version']) {
-                            $jsdelivrcdn_url = self::JSDELIVR_CDN_URL."wp/plugins/{$matches['plugin']}/tags/{$plugin_data['Version']}/{$matches['file']}";
+                        	$temp = self::JSDELIVR_CDN_URL."wp/plugins/{$matches['plugin']}/tags/{$plugin_data['Version']}/{$matches['file']}";
+	                        if(self::checkUrlExists($temp)) {
+		                        $jsdelivrcdn_url = $temp;
+	                        }
                         }
                     }
                 } elseif(preg_match("/wp-content\/themes\/(?<theme>[^\/]*)\/(?<file>.*)/i", $script->src, $matches)) {
                     if($matches['theme'] && $matches['file']) {
                         $theme = wp_get_theme($matches['theme']);
                         if($theme->exists()) {
-                            $jsdelivrcdn_url = self::JSDELIVR_CDN_URL."wp/themes/{$matches['theme']}/{$theme->get('Version')}/{$matches['file']}";
+                        	$temp = self::JSDELIVR_CDN_URL."wp/themes/{$matches['theme']}/{$theme->get('Version')}/{$matches['file']}";
+                            if(self::checkUrlExists($temp)) {
+	                            $jsdelivrcdn_url = $temp;
+                            }
                         }
                     }
                 }
