@@ -63,9 +63,9 @@ jQuery(document).ready(function ($) {
 				e.preventDefault();
 
 				var $dashicons = $(this).find('.dashicons');
-				$dashicons.removeClass('hidden');
 
-				if(confirm('Are you sure to clear all jsdelivr stored urls?')){
+				if(confirm('Do you want to remove the stored jsDelivr URLs?')){
+					$dashicons.removeClass('hidden');
 					$.post(ajaxurl, {
 						'action': 'clear_source_list',
 						'security': _self.$form.data('ajaxnonce')
@@ -83,9 +83,9 @@ jQuery(document).ready(function ($) {
 				e.preventDefault();
 
 				var $dashicons = $(this).find('.dashicons');
-				$dashicons.removeClass('hidden');
 
-				if(confirm('Are you sure to remove all stored urls?')){
+				if(confirm('Do you want to remove the stored source?')){
+					$dashicons.removeClass('hidden');
 					$.post(ajaxurl, {
 						'action': 'delete_source_list',
 						'security': _self.$form.data('ajaxnonce')
@@ -104,12 +104,12 @@ jQuery(document).ready(function ($) {
 				e.preventDefault();
 
 				var $dashicons = $(this).find('.dashicons');
-				$dashicons.removeClass('hidden');
 
 				var $tr = $(this).closest('tr');
 				var handle = $tr.prop('id');
 
-				if(confirm('Are you sure to remove all stored urls?')){
+				if(confirm('Do you want to remove the stored jsDelivr URL?')){
+					$dashicons.removeClass('hidden');
 					$.post(ajaxurl, {
 						'action': 'clear_source',
 						'security': _self.$form.data('ajaxnonce'),
