@@ -130,7 +130,42 @@ class JsDelivrCdn
         return $links;
     }
 
+	/**
+	 * Check if remote url exists and files are same
+	 * @param $url
+	 * @param $sha256
+	 *
+	 * @return bool
+	 */
+	public static function checkRemoteFile($url, $sha256){
+		$accepted_status_codes = array( 200 );
 
+		$response = wp_safe_remote_get( $url );
+		if ( is_wp_error( $response ) || !in_array( wp_remote_retrieve_response_code( $response ), $accepted_status_codes ) ) {
+			return false;
+		}
+
+		$file_content = wp_remote_retrieve_body( $response );
+		$newFileSha256 = hash('sha256', $file_content);
+
+		return $newFileSha256 == $sha256;
+	}
+
+	/**
+	 * Check files by hash with jsdelivr api
+	 * @param $sha256
+	 * @return array|bool|mixed|object
+	 */
+	private static function get_jsdelivr_data($sha256) {
+		$response = wp_safe_remote_get( self::$jsdelivrHashLookupUrl.$sha256 );
+		if ( is_wp_error( $response )) {
+			return false;
+		}
+		$file_content = wp_remote_retrieve_body( $response );
+		$result = json_decode($file_content, true);
+		$result['sha256'] = $sha256;
+		return $result;
+	}
 
     /**
      * get jsdelivr url for script
@@ -142,42 +177,65 @@ class JsDelivrCdn
         $jsdelivrcdn_url = '';
         $plugin_data = [];
 
-        if($script->src) {
-            $jsdelivr_data = self::get_jsdelivr_data($source[self::ORIGINAL_SOURCE_URL]);
-            if($jsdelivr_data) {
-                if (isset($jsdelivr_data['file'])) {
-                    if($jsdelivr_data['name'] === 'WordPress/WordPress') {
-                        $jsdelivr_data['version'] = get_bloginfo( 'version' );
-                    }
-                    $jsdelivrcdn_url = self::JSDELIVR_CDN_URL."{$jsdelivr_data['type']}/{$jsdelivr_data['name']}@{$jsdelivr_data['version']}{$jsdelivr_data['file']}";
-                } elseif(preg_match("/wp-content\/plugins\/(?<plugin>[^\/]*)\/(?<file>.*)/i", $script->src, $matches)) {
-                    if($matches['plugin'] && $matches['file']) {
-                        $pluginFile = ABSPATH."wp-content/plugins/{$matches['plugin']}/{$matches['plugin']}.php";
-                        if(file_exists($pluginFile)) {
-                            $plugin_data = get_plugin_data($pluginFile);
-                        } else {
-                            $phpFiles = glob(ABSPATH."wp-content/plugins/{$matches['plugin']}/*.php");
-                            foreach ($phpFiles as $path) {
-                                $plugin_data = get_plugin_data($path);
-                                if($plugin_data['Version']) {
-                                    break;
-                                }
-                            }
-                        }
-                        if($plugin_data['Version']) {
-                            $jsdelivrcdn_url = self::JSDELIVR_CDN_URL."wp/plugins/{$matches['plugin']}/tags/{$plugin_data['Version']}/{$matches['file']}";
-                        }
-                    }
-                } elseif(preg_match("/wp-content\/themes\/(?<theme>[^\/]*)\/(?<file>.*)/i", $script->src, $matches)) {
-                    if($matches['theme'] && $matches['file']) {
-                        $theme = wp_get_theme($matches['theme']);
-                        if($theme->exists()) {
-                            $jsdelivrcdn_url = self::JSDELIVR_CDN_URL."wp/themes/{$matches['theme']}/{$theme->get('Version')}/{$matches['file']}";
-                        }
-                    }
-                }
-            }
-        }
+	    if(empty($script->src)) {
+		    return $jsdelivrcdn_url;
+	    }
+
+	    if(!defined('ABSPATH')) {
+		    trigger_error('ABSPATH is not defined');
+		    return $jsdelivrcdn_url;
+	    }
+
+		chdir( ABSPATH );
+	    $file_content = file_get_contents( $source[self::ORIGINAL_SOURCE_URL] );
+
+	    if ( !$file_content ) {
+		    return $jsdelivrcdn_url;
+	    }
+	    $sha256 = hash('sha256', $file_content);
+	    $jsdelivr_data = self::get_jsdelivr_data($sha256);
+
+	    if (isset($jsdelivr_data['file'])) {
+		    if($jsdelivr_data['name'] === 'WordPress/WordPress') {
+			    $jsdelivr_data['version'] = get_bloginfo( 'version' );
+		    }
+		    $temp = self::JSDELIVR_CDN_URL."{$jsdelivr_data['type']}/{$jsdelivr_data['name']}@{$jsdelivr_data['version']}{$jsdelivr_data['file']}";
+		    if(self::checkRemoteFile($temp, $sha256)) {
+			    $jsdelivrcdn_url = $temp;
+		    }
+
+	    } elseif(preg_match("/wp-content\/plugins\/(?<plugin>[^\/]*)\/(?<file>.*)/i", $script->src, $matches)) {
+		    if($matches['plugin'] && $matches['file']) {
+			    $pluginFile = ABSPATH."wp-content/plugins/{$matches['plugin']}/{$matches['plugin']}.php";
+			    if(file_exists($pluginFile)) {
+				    $plugin_data = get_plugin_data($pluginFile);
+			    } else {
+				    $phpFiles = glob(ABSPATH."wp-content/plugins/{$matches['plugin']}/*.php");
+				    foreach ($phpFiles as $path) {
+					    $plugin_data = get_plugin_data($path);
+					    if($plugin_data['Version']) {
+						    break;
+					    }
+				    }
+			    }
+			    if($plugin_data['Version']) {
+				    $temp = self::JSDELIVR_CDN_URL."wp/plugins/{$matches['plugin']}/tags/{$plugin_data['Version']}/{$matches['file']}";
+				    if(self::checkRemoteFile($temp, $sha256)) {
+					    $jsdelivrcdn_url = $temp;
+				    }
+			    }
+		    }
+	    } elseif(preg_match("/wp-content\/themes\/(?<theme>[^\/]*)\/(?<file>.*)/i", $script->src, $matches)) {
+		    if($matches['theme'] && $matches['file']) {
+			    $theme = wp_get_theme($matches['theme']);
+			    if($theme->exists()) {
+				    $temp = self::JSDELIVR_CDN_URL."wp/themes/{$matches['theme']}/{$theme->get('Version')}/{$matches['file']}";
+				    if(self::checkRemoteFile($temp, $sha256)) {
+					    $jsdelivrcdn_url = $temp;
+				    }
+			    }
+		    }
+	    }
         return $jsdelivrcdn_url;
     }
 
@@ -287,31 +345,7 @@ class JsDelivrCdn
         return $file_path;
     }
 
-    /**
-     * Check files by hash with jsdelivr api
-     * @param $file_path
-     * @return array|bool|mixed|object
-     */
-    private static function get_jsdelivr_data($file_path) {
-        $result = false;
-        if(defined('ABSPATH')) {
-            chdir(ABSPATH);
 
-            $file_content = file_get_contents($file_path);
-            if($file_content) {
-                $sha256 = hash('sha256', $file_content);
-                $context = stream_context_create(array(
-                    'http' => array('ignore_errors' => true),
-                ));
-                $result = json_decode(file_get_contents(self::$jsdelivrHashLookupUrl.$sha256, false, $context ), true);
-                $result['sha256'] = $sha256;
-                $result['file_path'] = $file_path;
-            }
-        } else {
-            trigger_error('ABSPATH is not defined');
-        }
-        return $result;
-    }
 
     /**
      * Add admin pages
