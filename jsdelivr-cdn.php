@@ -1,17 +1,17 @@
 <?php
 /**
+ * Description
+ *
  * @package JsDelivrCdn
+ * Plugin Name: jsDelivr CDN
+ * Plugin URI: https://jsdelivr.com/wp-plugin
+ * Description: The official plugin of jsDelivr.com, a free public CDN. An easy way to integrate the service and speed up your website using our super fast CDN.
+ * Version: 1.0
+ * Author: ProspectOne
+ * Author URI: https://prospectone.io/
+ * License: GPLv2 or later
+ * Text Domain: jsdelivrcdn
  */
-/*
-Plugin Name: jsDelivr CDN
-Plugin URI: https://jsdelivr.com/wp-plugin
-Description: The official plugin of jsDelivr.com, a free public CDN. An easy way to integrate the service and speed up your website using our super fast CDN.
-Version: 1.0
-Author: ProspectOne
-Author URI: https://prospectone.io/
-License: GPLv2 or later
-Text Domain: jsdelivrcdn
-*/
 
 /*
 This program is free software; you can redistribute it and/or
@@ -31,25 +31,38 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 Copyright 2005-2015 Automattic, Inc.
 */
 
-// Make sure we don't expose any info if called directly
-if ( !function_exists( 'add_action' ) ) {
-    echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
-    exit;
+/*Make sure we don't expose any info if called directly*/
+if ( ! function_exists( 'add_action' ) ) {
+	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+	exit;
 }
 
 define( 'JSDELIVRCDN_VERSION', '1.0' );
 define( 'JSDELIVRCDN_MINIMUM_WP_VERSION', '4.0' );
 define( 'JSDELIVRCDN_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
-define( 'JSDELIVRCDN_PLUGIN_NAME', plugin_basename(__FILE__ ) );
-define( 'JSDELIVRCDN_PLUGIN_URL', plugin_dir_url(__FILE__ ) );
+define( 'JSDELIVRCDN_PLUGIN_NAME', plugin_basename( __FILE__ ) );
+define( 'JSDELIVRCDN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
-require_once( JSDELIVRCDN_PLUGIN_PATH . 'classes/class.jsdelivrcdn.php' );
+/**
+ * Add cron interval
+ */
+add_filter( 'cron_schedules', function() {
+	if ( ! isset( $schedules['fifteen_minutes'] ) ) {
+		$schedules['five_minutes'] = array(
+			'interval' => 15 * 60,
+			'display'  => esc_html__( 'Every Fifteen Minutes' ),
+		);
+	}
+} );
 
-// activation
+/**
+ * Include JsdelivrCdn class
+ */
+require_once JSDELIVRCDN_PLUGIN_PATH . 'classes/class-jsdelivrcdn.php';
+
+/** Activation */
 register_activation_hook( __FILE__, array( 'JsDelivrCdn', 'activate' ) );
-// deactivation
+/** Deactivation */
 register_deactivation_hook( __FILE__, array( 'JsDelivrCdn', 'deactivate' ) );
-
-add_filter( 'cron_schedules', ['JsDelivrCdn','five_minutes_cron_interval'] );
 
 add_action( 'init', array( 'JsDelivrCdn', 'init' ) );

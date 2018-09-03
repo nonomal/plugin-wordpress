@@ -1,96 +1,110 @@
 <?php
-
 /**
  * Class JsDelivrCdn
  */
 class JsDelivrCdn
 {
-    const SOURCE_LIST = 'source_list';
-    const ADVANCED_MODE = 'advanced_mode';
-    const AUTOENABLE = 'autoenable';
-    const PLUGIN_SETTINGS = 'jsdelivrcdn_settings';
-    const JSDELIVR_SOURCE_URL = 'jsdelivr_url';
-    const ORIGINAL_SOURCE_URL = 'original_url';
-    const SOURCE_LAST_LOADED = 'last_loaded_datetime';
-    const JSDELIVR_ANALYZE_CRON_HOOK = 'jsdelivr_analyze_cron_hook';
-    const JSDELIVR_REMOVE_OLD_CRON_HOOK = 'jsdelivr_remove_old_cron_hook';
-    const JSDELIVR_CDN_URL = 'https://cdn.jsdelivr.net/';
+	const SOURCE_LIST = 'source_list';
 
-    /**
-     * @var bool
-     */
-    private static $initiated = false;
-    /**
-     * @var string
-     */
-    private static $jsdelivrHashLookupUrl = "https://data.jsdelivr.com/v1/lookup/hash/";
-    /**
-     * @var array
-     */
-    private static $options;
+	const ADVANCED_MODE = 'advanced_mode';
 
-    /**
-     * Init function
-     */
-    public static function init() {
-        self::$options = get_option(self::PLUGIN_SETTINGS);
-        if ( ! self::$initiated ) {
-            self::init_hooks();
-        }
+	const AUTOENABLE = 'autoenable';
 
-        if ( ! wp_next_scheduled( self::JSDELIVR_ANALYZE_CRON_HOOK )) {
-            wp_schedule_event( time(), 'five_minutes', self::JSDELIVR_ANALYZE_CRON_HOOK );
-        }
-    }
+	const PLUGIN_SETTINGS = 'jsdelivrcdn_settings';
 
-    /**
-     * Init hooks
-     */
-    private static function init_hooks(){
-        self::$initiated = true;
+	const JSDELIVR_SOURCE_URL = 'jsdelivr_url';
 
-        add_action( self::JSDELIVR_ANALYZE_CRON_HOOK,  ['JsDelivrCdn', 'analyze']);
-        add_action( self::JSDELIVR_REMOVE_OLD_CRON_HOOK,  ['JsDelivrCdn', 'clear_old_sources']);
+	const ORIGINAL_SOURCE_URL = 'original_url';
 
-        if(is_admin()) {
-            add_action('admin_menu', ['JsDelivrCdn', 'add_admin_pages']);
-            add_action('admin_init', ['JsDelivrCdn', 'admin_init'] );
-            add_filter('plugin_action_links_'.JSDELIVRCDN_PLUGIN_NAME, ['JsDelivrCdn','settings_link']);
-            add_action( 'admin_enqueue_scripts', ['JsDelivrCdn','admin_enqueue_scripts'] );
+	const SOURCE_LAST_LOADED = 'last_loaded_datetime';
 
-            add_action( 'wp_ajax_clear_source_list', ['JsDelivrCdn','clear_source_list'] );
-            add_action( 'wp_ajax_clear_source', ['JsDelivrCdn','clear_source'] );
-            add_action( 'wp_ajax_get_source_list', ['JsDelivrCdn', 'get_source_list']);
-            add_action( 'wp_ajax_jsdelivr_analyze', ['JsDelivrCdn', 'jsdelivr_analyze']);
-            add_action( 'wp_ajax_delete_source_list', ['JsDelivrCdn', 'delete_source_list']);
-            add_action( 'wp_ajax_advanced_mode_switch', ['JsDelivrCdn', 'advanced_mode_switch']);
-        } else {
-            add_action( 'wp_print_scripts', ['JsDelivrCdn', 'custom_enqueue_scripts'], 999);
-            add_action( 'wp_print_styles', ['JsDelivrCdn', 'custom_enqueue_styles'], 999 );
-        }
+	const JSDELIVR_ANALYZE_CRON_HOOK = 'jsdelivr_analyze_cron_hook';
 
-    }
+	const JSDELIVR_REMOVE_OLD_CRON_HOOK = 'jsdelivr_remove_old_cron_hook';
 
-    /**
-     * Plugin activation hook
-     */
-    public static function activate() {
-        if(!self::$options = get_option(self::PLUGIN_SETTINGS)) {
-            self::$options = [
-                self::SOURCE_LIST => [],
-                self::ADVANCED_MODE => false,
-                self::AUTOENABLE => true
-            ];
-            add_option(self::PLUGIN_SETTINGS, self::$options);
-        }
+	const JSDELIVR_CDN_URL = 'https://cdn.jsdelivr.net/';
 
-        if ( ! wp_next_scheduled( self::JSDELIVR_ANALYZE_CRON_HOOK )) {
-            wp_schedule_event( time(), 'five_minutes', self::JSDELIVR_ANALYZE_CRON_HOOK );
-        }
+	/**
+	 * Set true when plugin initialized
+	 *
+	 * @var bool
+	 */
+	private static $initiated = false;
+	/**
+	 * Hash lookup URL
+	 *
+	 * @var string
+	 */
+	private static $jsdelivr_hash_lookup_url = 'https://data.jsdelivr.com/v1/lookup/hash/';
+	/**
+	 * Options
+	 *
+	 * @var array
+	 */
+	private static $options;
 
-        if ( ! wp_next_scheduled( self::JSDELIVR_REMOVE_OLD_CRON_HOOK ) ) {
-            wp_schedule_event( time(), 'daily', self::JSDELIVR_REMOVE_OLD_CRON_HOOK );
-        }
+	/**
+	 * Init function
+	 */
+	public static function init() {
+		self::$options = get_option( self::PLUGIN_SETTINGS );
+		if ( ! self::$initiated ) {
+			self::init_hooks();
+		}
+
+		if ( ! wp_next_scheduled( self::JSDELIVR_ANALYZE_CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'five_minutes', self::JSDELIVR_ANALYZE_CRON_HOOK );
+		}
+	}
+
+	/**
+	 * Init hooks
+	 */
+	private static function init_hooks() {
+		self::$initiated = true;
+
+		add_action( self::JSDELIVR_ANALYZE_CRON_HOOK, [ 'JsDelivrCdn', 'analyze' ] );
+		add_action( self::JSDELIVR_REMOVE_OLD_CRON_HOOK, [ 'JsDelivrCdn', 'clear_old_sources' ] );
+
+		if ( is_admin() ) {
+			add_action( 'admin_menu', [ 'JsDelivrCdn', 'add_admin_pages' ] );
+			add_action( 'admin_init', [ 'JsDelivrCdn', 'admin_init' ] );
+			add_filter( 'plugin_action_links_' . JSDELIVRCDN_PLUGIN_NAME, [ 'JsDelivrCdn', 'settings_link' ] );
+			add_action( 'admin_enqueue_scripts', [ 'JsDelivrCdn', 'admin_enqueue_scripts' ] );
+
+			add_action( 'wp_ajax_clear_source_list', [ 'JsDelivrCdn', 'clear_source_list' ] );
+			add_action( 'wp_ajax_clear_source', [ 'JsDelivrCdn', 'clear_source' ] );
+			add_action( 'wp_ajax_get_source_list', [ 'JsDelivrCdn', 'get_source_list' ] );
+			add_action( 'wp_ajax_jsdelivr_analyze', [ 'JsDelivrCdn', 'jsdelivr_analyze' ] );
+			add_action( 'wp_ajax_delete_source_list', [ 'JsDelivrCdn', 'delete_source_list' ] );
+			add_action( 'wp_ajax_advanced_mode_switch', [ 'JsDelivrCdn', 'advanced_mode_switch' ] );
+		} else {
+			add_action( 'wp_print_scripts', [ 'JsDelivrCdn', 'custom_enqueue_scripts' ], 999 );
+			add_action( 'wp_print_styles', [ 'JsDelivrCdn', 'custom_enqueue_styles' ], 999 );
+		}
+	}
+
+	/**
+	 * Plugin activation hook
+	 */
+	public static function activate() {
+		self::$options = get_option( self::PLUGIN_SETTINGS );
+		if ( ! self::$options ) {
+			self::$options = [
+				self::SOURCE_LIST   => [],
+				self::ADVANCED_MODE => false,
+				self::AUTOENABLE    => true,
+			];
+			add_option( self::PLUGIN_SETTINGS, self::$options );
+		}
+
+		if ( ! wp_next_scheduled( self::JSDELIVR_ANALYZE_CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'fifteen_minutes', self::JSDELIVR_ANALYZE_CRON_HOOK );
+		}
+
+		if ( ! wp_next_scheduled( self::JSDELIVR_REMOVE_OLD_CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'daily', self::JSDELIVR_REMOVE_OLD_CRON_HOOK );
+		}
 
         //flush rewrite rules
         flush_rewrite_rules();
@@ -303,7 +317,7 @@ class JsDelivrCdn
                 $context = stream_context_create(array(
                     'http' => array('ignore_errors' => true),
                 ));
-                $result = json_decode(file_get_contents(self::$jsdelivrHashLookupUrl.$sha256, false, $context ), true);
+                $result = json_decode(file_get_contents( self::$jsdelivr_hash_lookup_url . $sha256, false, $context ), true);
                 $result['sha256'] = $sha256;
                 $result['file_path'] = $file_path;
             }
@@ -493,22 +507,6 @@ class JsDelivrCdn
         echo json_encode(['result' => 'OK']);
 
         wp_die();
-    }
-
-    /**
-     * Register 5 minutes cron interval
-     * @param $schedules
-     * @return mixed
-     */
-    public static function five_minutes_cron_interval( $schedules ) {
-        if(!isset($schedules['five_minutes'])) {
-            $schedules['five_minutes'] = array(
-                'interval' => 5*60,
-                'display'  => esc_html__( 'Every Five Minutes' ),
-            );
-        }
-
-        return $schedules;
     }
 
     /**
