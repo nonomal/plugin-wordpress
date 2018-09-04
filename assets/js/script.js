@@ -1,4 +1,7 @@
 jQuery(document).ready(function ($) {
+	if(typeof window.ajaxurl === 'undefined') {
+		window.ajaxurl = '/wp-admin/admin-ajax.php';
+	}
 	/**
 	 * jsDelivr CDN Admin Helper
 	 * @type {*|Window.jsdelivrcdnHelper}
@@ -64,9 +67,9 @@ jQuery(document).ready(function ($) {
 
 				var $dashicons = $(this).find('.dashicons');
 
-				if(confirm('Do you want to remove the stored jsDelivr URLs?')){
+				if(window.confirm('Do you want to remove the stored jsDelivr URLs?')){
 					$dashicons.removeClass('hidden');
-					$.post(ajaxurl, {
+					$.post(window.ajaxurl, {
 						'action': 'clear_source_list',
 						'security': _self.$form.data('ajaxnonce')
 					}, function(response) {
@@ -84,9 +87,9 @@ jQuery(document).ready(function ($) {
 
 				var $dashicons = $(this).find('.dashicons');
 
-				if(confirm('Do you want to remove the stored source?')){
+				if(window.confirm('Do you want to remove the stored source?')){
 					$dashicons.removeClass('hidden');
-					$.post(ajaxurl, {
+					$.post(window.ajaxurl, {
 						'action': 'delete_source_list',
 						'security': _self.$form.data('ajaxnonce')
 					}, function(response) {
@@ -108,9 +111,9 @@ jQuery(document).ready(function ($) {
 				var $tr = $(this).closest('tr');
 				var handle = $tr.prop('id');
 
-				if(confirm('Do you want to remove the stored jsDelivr URL?')){
+				if(window.confirm('Do you want to remove the stored jsDelivr URL?')){
 					$dashicons.removeClass('hidden');
-					$.post(ajaxurl, {
+					$.post(window.ajaxurl, {
 						'action': 'clear_source',
 						'security': _self.$form.data('ajaxnonce'),
 						'handle': handle
@@ -118,7 +121,7 @@ jQuery(document).ready(function ($) {
 						if(response.result === 'OK') {
 							$tr.find('td.jsdelivr_url').text('');
 						}
-						$dashicons.addClass('hidden')
+						$dashicons.addClass('hidden');
 					}, 'json');
 				}
 			});
@@ -131,7 +134,7 @@ jQuery(document).ready(function ($) {
 				var $dashicons = $(this).find('.dashicons');
 				$dashicons.removeClass('hidden');
 
-				$.post(ajaxurl, {
+				$.post(window.ajaxurl, {
 					'action': 'jsdelivr_analyze',
 					'security': _self.$form.data('ajaxnonce')
 				}, function(response) {
@@ -156,7 +159,7 @@ jQuery(document).ready(function ($) {
 			});
 
 			$('#advanced_mode').on('change', function(){
-				$.post(ajaxurl, {
+				$.post(window.ajaxurl, {
 					'action': 'advanced_mode_switch',
 					'advanced_mode': $(this).is(':checked'),
 					'security': _self.$form.data('ajaxnonce')
@@ -180,7 +183,7 @@ jQuery(document).ready(function ($) {
 
 			var $tr, $td;
 
-			$.post(ajaxurl, {
+			$.post(window.ajaxurl, {
 				'action': 'get_source_list',
 				'security': _self.$form.data('ajaxnonce')
 			}, function(response) {
@@ -201,41 +204,41 @@ jQuery(document).ready(function ($) {
 						//Active
 						$td = $('<td></td>')
 							.addClass('check-column text-center')
-							.append('<input name="jsdelivrcdn_settings[source_list]['+index+'][active]" type="checkbox" title="Active" value="1" '+(data['active'] ? 'checked': '')+'>')
+							.append('<input name="jsdelivrcdn_settings[source_list]['+index+'][active]" type="checkbox" title="Active" value="1" '+(data.active ? 'checked': '')+'>')
 							.appendTo($tr);
 
-						if(typeof data['handle'] !== 'undefined') {
+						if(typeof data.handle !== 'undefined') {
 							//Name
 							$td = $('<td></td>')
-								.text(data['handle'])
+								.text(data.handle)
 								.appendTo($tr);
 						}
 
-						if(typeof data['ver'] !== 'undefined') {
+						if(typeof data.ver !== 'undefined') {
 							//Version
 							$td = $('<td></td>')
-								.text(data['ver'] ? data['ver']:'')
+								.text(data.ver ? data.ver:'')
 								.appendTo($tr);
 						}
 
 						//Origin
 						$td = $('<td></td>')
-							.text(data['original_url'])
+							.text(data.original_url)
 							.appendTo($tr);
 
 						//jsDelivr
 						$td = $('<td></td>')
 							.addClass('jsdelivr_url')
-							.text(data['jsdelivr_url'])
+							.text(data.jsdelivr_url)
 							.appendTo($tr);
 
-						if(typeof data['ver'] !== 'undefined') {
+						if(typeof data.ver !== 'undefined') {
 							$td = $('<td></td>')
 								.append('<button class="button button-primary clear_source" ><span class="dashicons dashicons-update spin hidden"></span> Clear</button>')
 								.appendTo($tr);
 						}
 
-					})
+					});
 				}
 				if(typeof callback === 'function') {
 					callback();
