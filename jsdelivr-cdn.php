@@ -46,13 +46,14 @@ define( 'JSDELIVRCDN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 /**
  * Add cron interval
  */
-add_filter( 'cron_schedules', function() {
+add_filter( 'cron_schedules', function( $schedules ) {
 	if ( ! isset( $schedules['fifteen_minutes'] ) ) {
 		$schedules['five_minutes'] = array(
 			'interval' => 15 * 60,
 			'display'  => esc_html__( 'Every Fifteen Minutes' ),
 		);
 	}
+	return $schedules;
 } );
 
 /**
