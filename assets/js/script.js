@@ -51,14 +51,14 @@ jQuery(document).ready(function ($) {
 				e.stopPropagation();
 				e.preventDefault();
 
-				$('input[name*=jsdelivrcdn_settings]').prop('checked', true);
+				$('input[name*=source_list]').prop('checked', true);
 			});
 
 			$('#unselect_all').on('click', function(e){
 				e.stopPropagation();
 				e.preventDefault();
 
-				$('input[name*=jsdelivrcdn_settings]').prop('checked', false);
+				$('input[name*=source_list]').prop('checked', false);
 			});
 
 			$('#clear_source_list').on('click', function(e){
@@ -170,6 +170,39 @@ jQuery(document).ready(function ($) {
 				}, 'json');
 			});
 
+			$('#autoenable').on('change', function(){
+				$.post(window.ajaxurl, {
+					'action': 'autoenable_switch',
+					'autoenable': $(this).is(':checked'),
+					'security': _self.$form.data('ajaxnonce')
+				}, function(response) {
+					if(response.result !== 'OK') {
+						$(this).prop('checked', !$(this).is(':checked'));
+					}
+				}, 'json');
+			});
+
+			$('#submit').on('click', function(e) {
+				e.stopPropagation();
+				e.preventDefault();
+
+				var $dashicons = $(this).find('.dashicons');
+				$dashicons.removeClass('hidden');
+				$.post(window.ajaxurl, {
+					'action': 'save_form',
+					'source_list': $('[name*=source_list]').map(function(i, item){ return item.dataset.index; }).join(','),
+					'security': _self.$form.data('ajaxnonce')
+				}, function(response) {
+					if(response.result === 'OK') {
+						$dashicons.addClass('hidden');
+					} else {
+						_self.loadTableData(function(){
+							$dashicons.addClass('hidden');
+						});
+					}
+				}, 'json');
+			});
+
 			return _self;
 		},
 
@@ -204,7 +237,7 @@ jQuery(document).ready(function ($) {
 						//Active
 						$td = $('<td></td>')
 							.addClass('check-column text-center')
-							.append('<input name="jsdelivrcdn_settings[source_list]['+index+'][active]" type="checkbox" title="Active" value="1" '+(data.active ? 'checked': '')+'>')
+							.append('<input name="source_list['+index+']" data-index="'+index+'" type="checkbox" title="Active" value="1" '+(data.active ? 'checked': '')+'>')
 							.appendTo($tr);
 
 						if(typeof data.handle !== 'undefined') {

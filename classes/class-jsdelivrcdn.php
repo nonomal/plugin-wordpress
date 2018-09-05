@@ -83,6 +83,8 @@ class JsDelivrCdn {
 			add_action( 'wp_ajax_jsdelivr_analyze', [ 'JsDelivrCdn', 'jsdelivr_analyze' ] );
 			add_action( 'wp_ajax_delete_source_list', [ 'JsDelivrCdn', 'delete_source_list' ] );
 			add_action( 'wp_ajax_advanced_mode_switch', [ 'JsDelivrCdn', 'advanced_mode_switch' ] );
+			add_action( 'wp_ajax_autoenable_switch', [ 'JsDelivrCdn', 'autoenable_switch' ] );
+			add_action( 'wp_ajax_save_form', [ 'JsDelivrCdn', 'save_form' ] );
 		} else {
 			add_action( 'wp_print_scripts', [ 'JsDelivrCdn', 'custom_enqueue_scripts' ], 999 );
 			add_action( 'wp_print_styles', [ 'JsDelivrCdn', 'custom_enqueue_styles' ], 999 );
@@ -407,7 +409,7 @@ class JsDelivrCdn {
 	 * Init Admin page setting, sections and fields
 	 */
 	public static function admin_init() {
-		register_setting( self::PLUGIN_SETTINGS, self::PLUGIN_SETTINGS, [ 'JsDelivrCdn', 'validate_settings' ] );
+		register_setting( self::PLUGIN_SETTINGS, self::PLUGIN_SETTINGS );
 		add_settings_section( self::PLUGIN_SETTINGS, '', '', 'main_settings' );
 		add_settings_field( self::ADVANCED_MODE, 'Advanced mode', function() {
 			?>
@@ -417,48 +419,10 @@ class JsDelivrCdn {
 		}, 'main_settings', self::PLUGIN_SETTINGS );
 		add_settings_field(self::AUTOENABLE, 'Automatically enable', function() {
 			?>
-			<input id="<?php esc_attr( self::AUTOENABLE ); ?>" <?php echo esc_attr( self::$options[ self::AUTOENABLE ] ? 'checked' : '' ); ?>
+			<input id="<?php echo esc_attr( self::AUTOENABLE ); ?>" <?php echo esc_attr( self::$options[ self::AUTOENABLE ] ? 'checked' : '' ); ?>
 			type="checkbox" name="<?php echo esc_attr( self::AUTOENABLE ); ?>" title="Automatically enable">
 			<?php
 		}, 'main_settings', self::PLUGIN_SETTINGS );
-	}
-
-	/**
-	 * Validate settings update
-	 *
-	 * @param array $data Post data.
-	 * @return array
-	 */
-	public static function validate_settings( $data ) {
-		check_ajax_referer( 'update', '_wpnonce' );
-
-		if ( ! isset( $_POST['action'] ) || 'update' !== $_POST['action'] ) {
-			return $data;
-		}
-
-		if ( isset( $data[ self::SOURCE_LIST ] ) ) {
-			foreach ( self::$options[ self::SOURCE_LIST ] as $key => $item ) {
-				if ( isset( $data[ self::SOURCE_LIST ][ $key ]['active'] ) ) {
-					self::$options[ self::SOURCE_LIST ][ $key ]['active'] = true;
-				} else {
-					self::$options[ self::SOURCE_LIST ][ $key ]['active'] = false;
-				}
-			}
-		}
-
-		if ( isset( $_POST[ self::ADVANCED_MODE ] ) ) {
-			self::$options[ self::ADVANCED_MODE ] = true;
-		} else {
-			self::$options[ self::ADVANCED_MODE ] = false;
-		}
-
-		if ( isset( $_POST[ self::AUTOENABLE ] ) ) {
-			self::$options[ self::AUTOENABLE ] = true;
-		} else {
-			self::$options[ self::AUTOENABLE ] = false;
-		}
-
-		return self::$options;
 	}
 
 	/**
@@ -611,7 +575,7 @@ class JsDelivrCdn {
 	}
 
 	/**
-	 * Switch settings page to advanced mode
+	 * Switch advanced mode setting
 	 */
 	public static function advanced_mode_switch() {
 		check_ajax_referer( JSDELIVRCDN_PLUGIN_NAME, 'security' );
@@ -619,6 +583,55 @@ class JsDelivrCdn {
 		if ( ! empty( $_POST[ self::ADVANCED_MODE ] ) ) {
 			self::$options[ self::ADVANCED_MODE ] = filter_var( wp_unslash( $_POST[ self::ADVANCED_MODE ] ), FILTER_VALIDATE_BOOLEAN );
 
+			update_option( self::PLUGIN_SETTINGS, self::$options );
+
+			echo wp_json_encode( [ 'result' => 'OK' ] );
+		} else {
+			echo wp_json_encode( [
+				'result'  => 'ERROR',
+				'message' => 'Input value not set',
+			] );
+		}
+		wp_die();
+	}
+
+	/**
+	 * Switch autoenable setting
+	 */
+	public static function autoenable_switch() {
+		check_ajax_referer( JSDELIVRCDN_PLUGIN_NAME, 'security' );
+
+		if ( ! empty( $_POST[ self::AUTOENABLE ] ) ) {
+			self::$options[ self::AUTOENABLE ] = filter_var( wp_unslash( $_POST[ self::AUTOENABLE ] ), FILTER_VALIDATE_BOOLEAN );
+
+			update_option( self::PLUGIN_SETTINGS, self::$options );
+
+			echo wp_json_encode( [ 'result' => 'OK' ] );
+		} else {
+			echo wp_json_encode( [
+				'result'  => 'ERROR',
+				'message' => 'Input value not set',
+			] );
+		}
+		wp_die();
+	}
+
+	/**
+	 * Save form ajax
+	 */
+	public static function save_form() {
+		check_ajax_referer( JSDELIVRCDN_PLUGIN_NAME, 'security' );
+		filter_input_array( INPUT_POST, FILTER_SANITIZE_STRING );
+		if ( ! empty( $_POST['source_list'] ) ) {
+			$data = array_flip( explode( ',', filter_var( wp_unslash( $_POST['source_list'] ), FILTER_SANITIZE_STRING ) ) );
+
+			foreach ( self::$options[ self::SOURCE_LIST ] as $index => $source ) {
+				if ( isset( $data[ $index ] ) ) {
+					self::$options[ self::SOURCE_LIST ] [ $index ] ['active'] = true;
+				} else {
+					self::$options[ self::SOURCE_LIST ] [ $index ] ['active'] = false;
+				}
+			}
 			update_option( self::PLUGIN_SETTINGS, self::$options );
 
 			echo wp_json_encode( [ 'result' => 'OK' ] );
