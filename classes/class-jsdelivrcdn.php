@@ -491,13 +491,13 @@ class JsDelivrCdn {
 			update_option( self::PLUGIN_SETTINGS, self::$options );
 
 			echo wp_json_encode( [ 'result' => 'OK' ] );
-			wp_die();
 		} else {
 			echo wp_json_encode( [
 				'result'  => 'ERROR',
 				'message' => 'Input value not set',
 			] );
 		}
+		wp_die();
 	}
 
 	/**
@@ -615,19 +615,19 @@ class JsDelivrCdn {
 	 */
 	public static function advanced_mode_switch() {
 		check_ajax_referer( JSDELIVRCDN_PLUGIN_NAME, 'security' );
+
 		if ( ! empty( $_POST[ self::ADVANCED_MODE ] ) ) {
 			self::$options[ self::ADVANCED_MODE ] = filter_var( wp_unslash( $_POST[ self::ADVANCED_MODE ] ), FILTER_VALIDATE_BOOLEAN );
 
 			update_option( self::PLUGIN_SETTINGS, self::$options );
 
 			echo wp_json_encode( [ 'result' => 'OK' ] );
-
-			wp_die();
 		} else {
 			echo wp_json_encode( [
 				'result'  => 'ERROR',
 				'message' => 'Input value not set',
 			] );
 		}
+		wp_die();
 	}
 }
