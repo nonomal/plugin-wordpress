@@ -49,7 +49,7 @@ $options = get_option( JsDelivrCdn::PLUGIN_SETTINGS );
 				<button id="clear_source_list" class="button button-primary"><span class="dashicons dashicons-update spin hidden"></span> Clear All</button>
 			<?php } ?>
 			<button id="jsdelivr_analyze" class="button button-primary"><span class="dashicons dashicons-update spin hidden"></span> Analyze</button>
-			<input type="submit" name="submit" id="submit" class="button button-primary" style="float:right" value="Save Changes">
+			<button type="submit" name="submit" id="submit" class="button button-primary" style="float:right" ><span class="dashicons dashicons-update spin hidden"></span> Save Active</button>
 		</div>
 	</form>
 </div>
