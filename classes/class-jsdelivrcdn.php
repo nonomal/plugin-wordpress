@@ -229,7 +229,7 @@ class JsDelivrCdn {
 		chdir( ABSPATH );
 
 		if ( strpos( $source[ self::ORIGINAL_SOURCE_URL ], '//' ) !== false ) {
-			$response = wp_safe_remote_get( $source[ self::ORIGINAL_SOURCE_URL ] );
+			$response = wp_safe_remote_get( $source[ self::ORIGINAL_SOURCE_URL ], self::get_jsdelivr_cdn_request_options() );
 
 			$file_content = wp_remote_retrieve_body( $response );
 		} else {
