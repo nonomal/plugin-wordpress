@@ -203,7 +203,7 @@ jQuery( document ).ready( function ( $ ) {
 				$dashicons.removeClass( 'hidden' );
 				$.post( window.ajaxurl, {
 					'action': 'save_form',
-					'source_list': $.map( $( '[name*=source_list]' ), function( item ){ return item.dataset.index; } ).join( ',' ),
+					'source_list': $.map( $( '[name*=source_list]:checked' ), function( item ){ return item.dataset.index; } ).join( ',' ),
 					'security': _self.$form.data( 'ajaxnonce' )
 				}, function( response ) {
 					if( response.result === 'OK' ) {
