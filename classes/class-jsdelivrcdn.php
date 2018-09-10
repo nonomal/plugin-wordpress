@@ -632,7 +632,7 @@ class JsDelivrCdn {
 	public static function save_form() {
 		check_ajax_referer( JSDELIVRCDN_PLUGIN_NAME, 'security' );
 		filter_input_array( INPUT_POST, FILTER_SANITIZE_STRING );
-		if ( ! empty( $_POST['source_list'] ) ) {
+		if ( isset( $_POST['source_list'] ) ) {
 			$data = array_flip( explode( ',', filter_var( wp_unslash( $_POST['source_list'] ), FILTER_SANITIZE_STRING ) ) );
 
 			foreach ( self::$options[ self::SOURCE_LIST ] as $index => $source ) {
