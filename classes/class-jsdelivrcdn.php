@@ -473,12 +473,18 @@ class JsDelivrCdn {
 			'main_settings',
 			self::PLUGIN_SETTINGS
 		);
-        add_settings_field(self::AUTOMINIFY, 'Automatically minify files', function() {
-            ?>
-            <input id="<?php echo esc_attr( self::AUTOMINIFY ); ?>" <?php echo esc_attr( self::$options[ self::AUTOMINIFY ] ? 'checked' : '' ); ?>
-                   type="checkbox" name="<?php echo esc_attr( self::AUTOMINIFY ); ?>" title="Automatically enable">
-            <?php
-        }, 'main_settings', self::PLUGIN_SETTINGS );
+		add_settings_field(
+			self::AUTOMINIFY,
+			'Automatically minify files',
+			function() {
+				?>
+			<input id="<?php echo esc_attr( self::AUTOMINIFY ); ?>" <?php echo esc_attr( self::$options[ self::AUTOMINIFY ] ? 'checked' : '' ); ?>
+			type="checkbox" name="<?php echo esc_attr( self::AUTOMINIFY ); ?>" title="Automatically minify">
+				<?php
+			},
+			'main_settings',
+			self::PLUGIN_SETTINGS
+		);
 	}
 
 	/**
