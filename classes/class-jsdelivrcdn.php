@@ -15,6 +15,8 @@ class JsDelivrCdn {
 
 	const AUTOENABLE = 'autoenable';
 
+	const AUTOMINIFY = 'autominify';
+
 	const PLUGIN_SETTINGS = 'jsdelivrcdn_settings';
 
 	const JSDELIVR_SOURCE_URL = 'jsdelivr_url';
@@ -28,6 +30,8 @@ class JsDelivrCdn {
 	const JSDELIVR_REMOVE_OLD_CRON_HOOK = 'jsdelivr_remove_old_cron_hook';
 
 	const JSDELIVR_CDN_URL = 'https://cdn.jsdelivr.net/';
+
+	const COMMENT_PATTERN = '/\/\*[\s\S]*?\*\/|\/\/.*?(?:\n|$)/';
 
 	/**
 	 * Set true when plugin initialized
@@ -111,6 +115,7 @@ class JsDelivrCdn {
 				self::SOURCE_LIST   => [],
 				self::ADVANCED_MODE => false,
 				self::AUTOENABLE    => true,
+				self::AUTOMINIFY    => true,
 			];
 			add_option( self::PLUGIN_SETTINGS, self::$options );
 		}
@@ -286,7 +291,22 @@ class JsDelivrCdn {
 				}
 			}
 		}
+
+		if ( self::$options[ self::AUTOMINIFY ] && ! self::check_if_file_minified( $file_content ) ) {
+			$jsdelivrcdn_url = substr_replace( $jsdelivrcdn_url, '.min', strrpos( $jsdelivrcdn_url, '.' ), 0 );
+		}
 		return $jsdelivrcdn_url;
+	}
+
+	/**
+	 * Check is file minified
+	 *
+	 * @param string $file_content File content.
+	 * @return bool
+	 */
+	private static function check_if_file_minified( $file_content ) {
+		$code = preg_replace( self::COMMENT_PATTERN, '', $file_content );
+		return strlen( $code ) / count( preg_split( '/\n/', $code ) ) > 200;
 	}
 
 	/**
@@ -431,6 +451,12 @@ class JsDelivrCdn {
 			?>
 			<input id="<?php echo esc_attr( self::AUTOENABLE ); ?>" <?php echo esc_attr( self::$options[ self::AUTOENABLE ] ? 'checked' : '' ); ?>
 			type="checkbox" name="<?php echo esc_attr( self::AUTOENABLE ); ?>" title="Automatically enable">
+			<?php
+		}, 'main_settings', self::PLUGIN_SETTINGS );
+		add_settings_field(self::AUTOMINIFY, 'Automatically minify files', function() {
+			?>
+			<input id="<?php echo esc_attr( self::AUTOMINIFY ); ?>" <?php echo esc_attr( self::$options[ self::AUTOMINIFY ] ? 'checked' : '' ); ?>
+				   type="checkbox" name="<?php echo esc_attr( self::AUTOMINIFY ); ?>" title="Automatically enable">
 			<?php
 		}, 'main_settings', self::PLUGIN_SETTINGS );
 	}
