@@ -228,8 +228,9 @@ class JsDelivrCdn {
 
 		chdir( ABSPATH );
 
-		if ( strpos( $source[ self::ORIGINAL_SOURCE_URL ], '//' ) !== false ) {
-			$response = wp_safe_remote_get( $source[ self::ORIGINAL_SOURCE_URL ], self::get_jsdelivr_cdn_request_options() );
+		$position = strpos( $source[ self::ORIGINAL_SOURCE_URL ], '//' );
+		if ( false !== $position ) {
+			$response = wp_safe_remote_get( ( 0 === $position ? 'http:' : '' ) . $source[ self::ORIGINAL_SOURCE_URL ], self::get_jsdelivr_cdn_request_options() );
 
 			$file_content = wp_remote_retrieve_body( $response );
 		} else {
@@ -411,8 +412,15 @@ class JsDelivrCdn {
 	 * Add admin pages
 	 */
 	public static function add_admin_pages() {
-		add_menu_page( 'jsDelivr CDN', 'jsDelivr CDN', 'manage_options',
-		'jsdelivrcdn', [ 'JsDelivrCdn', 'get_admin_page_template' ], JSDELIVRCDN_PLUGIN_URL . 'assets/img/jsdelivr-icon.png', 110 );
+		add_menu_page(
+			'jsDelivr CDN',
+			'jsDelivr CDN',
+			'manage_options',
+			'jsdelivrcdn',
+			[ 'JsDelivrCdn', 'get_admin_page_template' ],
+			JSDELIVRCDN_PLUGIN_URL . 'assets/img/jsdelivr-icon.png',
+			110
+		);
 	}
 
 	/**
@@ -421,18 +429,30 @@ class JsDelivrCdn {
 	public static function admin_init() {
 		register_setting( self::PLUGIN_SETTINGS, self::PLUGIN_SETTINGS );
 		add_settings_section( self::PLUGIN_SETTINGS, '', '', 'main_settings' );
-		add_settings_field( self::ADVANCED_MODE, 'Advanced mode', function() {
-			?>
+		add_settings_field(
+			self::ADVANCED_MODE,
+			'Advanced mode',
+			function() {
+				?>
 			<input id="<?php echo esc_attr( self::ADVANCED_MODE ); ?>" <?php echo esc_attr( self::$options[ self::ADVANCED_MODE ] ? 'checked' : '' ); ?>
 			type="checkbox" name="<?php echo esc_attr( self::ADVANCED_MODE ); ?>" title="Advanced mode">
-			<?php
-		}, 'main_settings', self::PLUGIN_SETTINGS );
-		add_settings_field(self::AUTOENABLE, 'Automatically enable', function() {
-			?>
+				<?php
+			},
+			'main_settings',
+			self::PLUGIN_SETTINGS
+		);
+		add_settings_field(
+			self::AUTOENABLE,
+			'Automatically enable',
+			function() {
+				?>
 			<input id="<?php echo esc_attr( self::AUTOENABLE ); ?>" <?php echo esc_attr( self::$options[ self::AUTOENABLE ] ? 'checked' : '' ); ?>
 			type="checkbox" name="<?php echo esc_attr( self::AUTOENABLE ); ?>" title="Automatically enable">
-			<?php
-		}, 'main_settings', self::PLUGIN_SETTINGS );
+				<?php
+			},
+			'main_settings',
+			self::PLUGIN_SETTINGS
+		);
 	}
 
 	/**
@@ -466,10 +486,12 @@ class JsDelivrCdn {
 
 			echo wp_json_encode( [ 'result' => 'OK' ] );
 		} else {
-			echo wp_json_encode( [
-				'result'  => 'ERROR',
-				'message' => 'Input value not set',
-			] );
+			echo wp_json_encode(
+				[
+					'result'  => 'ERROR',
+					'message' => 'Input value not set',
+				]
+			);
 		}
 		wp_die();
 	}
@@ -498,16 +520,19 @@ class JsDelivrCdn {
 			}
 		}
 
-		echo wp_json_encode( [
-			'result' => 'OK',
-			'data'   => $data,
-		] );
+		echo wp_json_encode(
+			[
+				'result' => 'OK',
+				'data'   => $data,
+			]
+		);
 
 		wp_die();
 	}
 
 	/**
 	 * Analyze sources
+	 *
 	 * @return array
 	 */
 	public static function analyze() {
@@ -544,10 +569,12 @@ class JsDelivrCdn {
 
 		$data = self::analyze();
 
-		echo wp_json_encode( [
-			'result' => 'OK',
-			'data'   => $data,
-		]);
+		echo wp_json_encode(
+			[
+				'result' => 'OK',
+				'data'   => $data,
+			]
+		);
 
 		wp_die();
 	}
@@ -597,10 +624,12 @@ class JsDelivrCdn {
 
 			echo wp_json_encode( [ 'result' => 'OK' ] );
 		} else {
-			echo wp_json_encode( [
-				'result'  => 'ERROR',
-				'message' => 'Input value not set',
-			] );
+			echo wp_json_encode(
+				[
+					'result'  => 'ERROR',
+					'message' => 'Input value not set',
+				]
+			);
 		}
 		wp_die();
 	}
@@ -618,10 +647,12 @@ class JsDelivrCdn {
 
 			echo wp_json_encode( [ 'result' => 'OK' ] );
 		} else {
-			echo wp_json_encode( [
-				'result'  => 'ERROR',
-				'message' => 'Input value not set',
-			] );
+			echo wp_json_encode(
+				[
+					'result'  => 'ERROR',
+					'message' => 'Input value not set',
+				]
+			);
 		}
 		wp_die();
 	}
@@ -646,10 +677,12 @@ class JsDelivrCdn {
 
 			echo wp_json_encode( [ 'result' => 'OK' ] );
 		} else {
-			echo wp_json_encode( [
-				'result'  => 'ERROR',
-				'message' => 'Input value not set',
-			] );
+			echo wp_json_encode(
+				[
+					'result'  => 'ERROR',
+					'message' => 'Input value not set',
+				]
+			);
 		}
 		wp_die();
 	}

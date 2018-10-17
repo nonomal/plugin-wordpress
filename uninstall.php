@@ -5,13 +5,15 @@
  * @package JsDelivrCdn
  */
 
-if(!defined('WP_UNINSTALL_PLUGIN')) {
-    exit;
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	exit;
 }
 
-//jsDelivr CDN plugin options name
+// jsDelivr CDN plugin options name.
 $option_name = 'jsdelivrcdn_settings';
-//delete options
-delete_option($option_name);
-//delete option for Multisite
-delete_site_option($option_name);
+
+// Delete options.
+delete_option( $option_name );
+
+// Delete option for Multisite.
+delete_site_option( $option_name );
