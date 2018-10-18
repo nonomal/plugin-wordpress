@@ -296,6 +296,15 @@ class JsDelivrCdn {
 		if ( self::$options[ self::AUTOMINIFY ] && ! self::check_if_file_minified( $file_content ) ) {
 			$jsdelivrcdn_url = substr_replace( $jsdelivrcdn_url, '.min', strrpos( $jsdelivrcdn_url, '.' ), 0 );
 		}
+
+		$original_file_type = wp_check_filetype( $source[ self::ORIGINAL_SOURCE_URL ] );
+
+		$mirror_file_type = wp_check_filetype( $jsdelivrcdn_url );
+
+		if ( $original_file_type['ext'] !== $mirror_file_type['ext'] ) {
+			$jsdelivrcdn_url = '';
+		}
+
 		return $jsdelivrcdn_url;
 	}
 
