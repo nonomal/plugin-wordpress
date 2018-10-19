@@ -3,7 +3,7 @@ Contributors: jimaek
 Donate link: https://www.jsdelivr.com
 Tags: cdn,speed,jsdelivr,optimize,delivery,network,javascript,async,defer,performance,
 Requires at least: 4.0
-Tested up to: 4.9
+Tested up to: 5.0
 Stable tag: 1.0
 
 The official plugin of jsDelivr.com, a free public CDN. An easy way to integrate the service and speed up your website using our super fast CDN.
