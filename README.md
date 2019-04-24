@@ -3,8 +3,6 @@ jsdelivr-wordpress
 
 The official WordPress plugin for jsDelivr Free Public CDN
 
-https://wordpress.org/plugins/jsdelivr-wordpress-cdn-plugin/
-
 ## How this works
 
 1. We register a hook which looks for any JS/CSS files registered via WordPress API on every request.
