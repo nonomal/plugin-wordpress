@@ -50,7 +50,7 @@ add_filter(
 	'cron_schedules',
 	function( $schedules ) {
 		if ( ! isset( $schedules['fifteen_minutes'] ) ) {
-			$schedules['five_minutes'] = array(
+			$schedules['fifteen_minutes'] = array(
 				'interval' => 15 * 60,
 				'display'  => esc_html__( 'Every Fifteen Minutes' ),
 			);

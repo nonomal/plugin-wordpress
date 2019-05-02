@@ -72,7 +72,7 @@ class JsDelivrCdn {
 		}
 
 		if ( ! wp_next_scheduled( self::JSDELIVR_ANALYZE_CRON_HOOK ) ) {
-			wp_schedule_event( time(), 'five_minutes', self::JSDELIVR_ANALYZE_CRON_HOOK );
+			wp_schedule_event( time(), 'fifteen_minutes', self::JSDELIVR_ANALYZE_CRON_HOOK );
 		}
 	}
 
