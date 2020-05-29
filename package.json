@@ -15,7 +15,7 @@
 		"lint:css": "stylelint \"./**/*.{css,less}\"",
 		"lint:js": "eslint --ext .html,.js .",
 		"lint:js:fix": "eslint --fix --ext .html,.js .",
-		"lint:php": "php ./wpcs/vendor/squizlabs/php_codesniffer/bin/phpcs --extensions=php .",
+		"lint:php": "./wpcs/vendor/bin/phpcs --config-set installed_paths wpcs/ && php ./wpcs/vendor/squizlabs/php_codesniffer/bin/phpcs --extensions=php .",
 		"lint:php:fix": "php ./wpcs/vendor/squizlabs/php_codesniffer/bin/phpcbf --extensions=php .",
 		"test": "npm run lint"
 	}

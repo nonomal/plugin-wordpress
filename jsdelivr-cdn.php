@@ -59,6 +59,11 @@ add_filter(
 	}
 );
 
+/** Fix call to undefined function get_plugin_data() */
+if ( ! function_exists( 'get_plugin_data' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+
 /**
  * Include JsdelivrCdn class
  */
