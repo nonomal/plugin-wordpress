@@ -82,26 +82,26 @@ class JsDelivrCdn {
 	private static function init_hooks() {
 		self::$initiated = true;
 
-		add_action( self::JSDELIVR_ANALYZE_CRON_HOOK, [ 'JsDelivrCdn', 'analyze' ] );
-		add_action( self::JSDELIVR_REMOVE_OLD_CRON_HOOK, [ 'JsDelivrCdn', 'clear_old_sources' ] );
+		add_action( self::JSDELIVR_ANALYZE_CRON_HOOK, array( 'JsDelivrCdn', 'analyze' ) );
+		add_action( self::JSDELIVR_REMOVE_OLD_CRON_HOOK, array( 'JsDelivrCdn', 'clear_old_sources' ) );
 
 		if ( is_admin() ) {
-			add_action( 'admin_menu', [ 'JsDelivrCdn', 'add_admin_pages' ] );
-			add_action( 'admin_init', [ 'JsDelivrCdn', 'admin_init' ] );
-			add_filter( 'plugin_action_links_' . JSDELIVRCDN_PLUGIN_NAME, [ 'JsDelivrCdn', 'settings_link' ] );
-			add_action( 'admin_enqueue_scripts', [ 'JsDelivrCdn', 'admin_enqueue_scripts' ] );
+			add_action( 'admin_menu', array( 'JsDelivrCdn', 'add_admin_pages' ) );
+			add_action( 'admin_init', array( 'JsDelivrCdn', 'admin_init' ) );
+			add_filter( 'plugin_action_links_' . JSDELIVRCDN_PLUGIN_NAME, array( 'JsDelivrCdn', 'settings_link' ) );
+			add_action( 'admin_enqueue_scripts', array( 'JsDelivrCdn', 'admin_enqueue_scripts' ) );
 
-			add_action( 'wp_ajax_clear_source_list', [ 'JsDelivrCdn', 'clear_source_list' ] );
-			add_action( 'wp_ajax_clear_source', [ 'JsDelivrCdn', 'clear_source' ] );
-			add_action( 'wp_ajax_get_source_list', [ 'JsDelivrCdn', 'get_source_list' ] );
-			add_action( 'wp_ajax_jsdelivr_analyze', [ 'JsDelivrCdn', 'jsdelivr_analyze' ] );
-			add_action( 'wp_ajax_delete_source_list', [ 'JsDelivrCdn', 'delete_source_list' ] );
-			add_action( 'wp_ajax_advanced_mode_switch', [ 'JsDelivrCdn', 'advanced_mode_switch' ] );
-			add_action( 'wp_ajax_autoenable_switch', [ 'JsDelivrCdn', 'autoenable_switch' ] );
-			add_action( 'wp_ajax_save_form', [ 'JsDelivrCdn', 'save_form' ] );
+			add_action( 'wp_ajax_clear_source_list', array( 'JsDelivrCdn', 'clear_source_list' ) );
+			add_action( 'wp_ajax_clear_source', array( 'JsDelivrCdn', 'clear_source' ) );
+			add_action( 'wp_ajax_get_source_list', array( 'JsDelivrCdn', 'get_source_list' ) );
+			add_action( 'wp_ajax_jsdelivr_analyze', array( 'JsDelivrCdn', 'jsdelivr_analyze' ) );
+			add_action( 'wp_ajax_delete_source_list', array( 'JsDelivrCdn', 'delete_source_list' ) );
+			add_action( 'wp_ajax_advanced_mode_switch', array( 'JsDelivrCdn', 'advanced_mode_switch' ) );
+			add_action( 'wp_ajax_autoenable_switch', array( 'JsDelivrCdn', 'autoenable_switch' ) );
+			add_action( 'wp_ajax_save_form', array( 'JsDelivrCdn', 'save_form' ) );
 		} else {
-			add_action( 'wp_print_scripts', [ 'JsDelivrCdn', 'custom_enqueue_scripts' ], 999 );
-			add_action( 'wp_print_styles', [ 'JsDelivrCdn', 'custom_enqueue_styles' ], 999 );
+			add_action( 'wp_print_scripts', array( 'JsDelivrCdn', 'custom_enqueue_scripts' ), 999 );
+			add_action( 'wp_print_styles', array( 'JsDelivrCdn', 'custom_enqueue_styles' ), 999 );
 		}
 	}
 
@@ -111,12 +111,12 @@ class JsDelivrCdn {
 	public static function activate() {
 		self::$options = get_option( self::PLUGIN_SETTINGS );
 		if ( ! self::$options ) {
-			self::$options = [
-				self::SOURCE_LIST   => [],
+			self::$options = array(
+				self::SOURCE_LIST   => array(),
 				self::ADVANCED_MODE => false,
 				self::AUTOENABLE    => true,
 				self::AUTOMINIFY    => true,
-			];
+			);
 			add_option( self::PLUGIN_SETTINGS, self::$options );
 		}
 
@@ -221,7 +221,7 @@ class JsDelivrCdn {
 
 		$jsdelivrcdn_url = '';
 
-		$plugin_data = [];
+		$plugin_data = array();
 
 		if ( empty( $script->src ) ) {
 			return $jsdelivrcdn_url;
@@ -340,13 +340,13 @@ class JsDelivrCdn {
 		}
 
 		if ( ! isset( self::$options[ self::SOURCE_LIST ][ $index ] ) ) {
-			self::$options[ self::SOURCE_LIST ][ $index ] = [
+			self::$options[ self::SOURCE_LIST ][ $index ] = array(
 				'handle'                  => $source,
 				self::JSDELIVR_SOURCE_URL => '',
 				self::ORIGINAL_SOURCE_URL => self::get_file_path( $source->src ),
 				'active'                  => self::$options[ self::AUTOENABLE ],
 				self::SOURCE_LAST_LOADED  => time(),
-			];
+			);
 
 			$updated = true;
 
@@ -446,7 +446,7 @@ class JsDelivrCdn {
 			'jsDelivr CDN',
 			'manage_options',
 			'jsdelivrcdn',
-			[ 'JsDelivrCdn', 'get_admin_page_template' ],
+			array( 'JsDelivrCdn', 'get_admin_page_template' ),
 			JSDELIVRCDN_PLUGIN_URL . 'assets/img/jsdelivr-icon.png',
 			110
 		);
@@ -508,7 +508,7 @@ class JsDelivrCdn {
 		}
 		update_option( self::PLUGIN_SETTINGS, self::$options );
 
-		echo wp_json_encode( [ 'result' => 'OK' ] );
+		echo wp_json_encode( array( 'result' => 'OK' ) );
 		wp_die();
 	}
 
@@ -525,13 +525,13 @@ class JsDelivrCdn {
 			}
 			update_option( self::PLUGIN_SETTINGS, self::$options );
 
-			echo wp_json_encode( [ 'result' => 'OK' ] );
+			echo wp_json_encode( array( 'result' => 'OK' ) );
 		} else {
 			echo wp_json_encode(
-				[
+				array(
 					'result'  => 'ERROR',
 					'message' => 'Input value not set',
-				]
+				)
 			);
 		}
 		wp_die();
@@ -543,15 +543,15 @@ class JsDelivrCdn {
 	public static function get_source_list() {
 		check_ajax_referer( JSDELIVRCDN_PLUGIN_NAME, 'security' );
 
-		$data = [];
+		$data = array();
 		foreach ( self::$options[ self::SOURCE_LIST ] as $index => $source ) {
 			if ( time() - $source[ self::SOURCE_LAST_LOADED ] <= 60 * 60 * 24 || self::$options[ self::ADVANCED_MODE ] ) {
 				if ( $source[ self::ORIGINAL_SOURCE_URL ] ) {
-					$data[ $index ] = [
+					$data[ $index ] = array(
 						'original_url' => $source[ self::ORIGINAL_SOURCE_URL ],
 						'jsdelivr_url' => $source[ self::JSDELIVR_SOURCE_URL ],
 						'active'       => $source['active'],
-					];
+					);
 					if ( self::$options[ self::ADVANCED_MODE ] ) {
 						$data[ $index ]['ver'] = $source['handle']->ver;
 
@@ -562,10 +562,10 @@ class JsDelivrCdn {
 		}
 
 		echo wp_json_encode(
-			[
+			array(
 				'result' => 'OK',
 				'data'   => $data,
-			]
+			)
 		);
 
 		wp_die();
@@ -578,7 +578,7 @@ class JsDelivrCdn {
 	 */
 	public static function analyze() {
 
-		$data = [];
+		$data = array();
 
 		$updated = false;
 		foreach ( self::$options[ self::SOURCE_LIST ] as $index => $source ) {
@@ -611,10 +611,10 @@ class JsDelivrCdn {
 		$data = self::analyze();
 
 		echo wp_json_encode(
-			[
+			array(
 				'result' => 'OK',
 				'data'   => $data,
-			]
+			)
 		);
 
 		wp_die();
@@ -626,11 +626,11 @@ class JsDelivrCdn {
 	public static function delete_source_list() {
 		check_ajax_referer( JSDELIVRCDN_PLUGIN_NAME, 'security' );
 
-		self::$options[ self::SOURCE_LIST ] = [];
+		self::$options[ self::SOURCE_LIST ] = array();
 
 		update_option( self::PLUGIN_SETTINGS, self::$options );
 
-		echo wp_json_encode( [ 'result' => 'OK' ] );
+		echo wp_json_encode( array( 'result' => 'OK' ) );
 
 		wp_die();
 	}
@@ -663,13 +663,13 @@ class JsDelivrCdn {
 
 			update_option( self::PLUGIN_SETTINGS, self::$options );
 
-			echo wp_json_encode( [ 'result' => 'OK' ] );
+			echo wp_json_encode( array( 'result' => 'OK' ) );
 		} else {
 			echo wp_json_encode(
-				[
+				array(
 					'result'  => 'ERROR',
 					'message' => 'Input value not set',
-				]
+				)
 			);
 		}
 		wp_die();
@@ -686,13 +686,13 @@ class JsDelivrCdn {
 
 			update_option( self::PLUGIN_SETTINGS, self::$options );
 
-			echo wp_json_encode( [ 'result' => 'OK' ] );
+			echo wp_json_encode( array( 'result' => 'OK' ) );
 		} else {
 			echo wp_json_encode(
-				[
+				array(
 					'result'  => 'ERROR',
 					'message' => 'Input value not set',
-				]
+				)
 			);
 		}
 		wp_die();
@@ -716,13 +716,13 @@ class JsDelivrCdn {
 			}
 			update_option( self::PLUGIN_SETTINGS, self::$options );
 
-			echo wp_json_encode( [ 'result' => 'OK' ] );
+			echo wp_json_encode( array( 'result' => 'OK' ) );
 		} else {
 			echo wp_json_encode(
-				[
+				array(
 					'result'  => 'ERROR',
 					'message' => 'Input value not set',
-				]
+				)
 			);
 		}
 		wp_die();
@@ -732,8 +732,8 @@ class JsDelivrCdn {
 	 * Get jsDelivrCdn request options
 	 */
 	private static function get_jsdelivr_cdn_request_options() {
-		return [
-			'headers' => [ 'User-Agent' => 'jsDelivr WP plugin/' . self::$jsdelivr_plugin_version ],
-		];
+		return array(
+			'headers' => array( 'User-Agent' => 'jsDelivr WP plugin/' . self::$jsdelivr_plugin_version ),
+		);
 	}
 }
