@@ -1,5 +1,6 @@
 {
 	"name": "plugin-wordpress",
+	"license": "OSL-3.0",
 	"private": true,
 	"dependencies": {},
 	"devDependencies": {
